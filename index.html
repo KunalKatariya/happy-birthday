@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Happy Birthday Gunika ❤️</title>
+
+  <!-- Google Fonts: Editorial Serif + Clean Sans + Natural Handwriting -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Instrument Serif"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            hand: ['"Caveat"', 'cursive'],
+          },
+          colors: {
+            midnight: '#09080E',
+            charcoal: '#14131B',
+            cream: '#FAF7F2',
+            gold: '#F0C27B',
+            rose: '#F472B6',
+            coral: '#FB7185',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      height: -webkit-fill-available;
+      overflow: hidden;
+      background: #09080E;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Fixed mobile frame container */
+    #app-container {
+      height: 100vh;
+      height: 100dvh;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+      background: #0D0C14;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Bokeh / Bouquet Blurry Moving Background */
+    .bokeh-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bokeh-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(65px);
+      opacity: 0.35;
+      animation: floatBokeh 14s infinite alternate ease-in-out;
+    }
+    .bokeh-1 {
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, #F43F5E, #E11D48);
+      top: -30px;
+      left: -40px;
+      animation-duration: 13s;
+    }
+    .bokeh-2 {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, #8B5CF6, #6366F1);
+      bottom: 12%;
+      right: -30px;
+      animation-duration: 17s;
+    }
+    .bokeh-3 {
+      width: 230px;
+      height: 230px;
+      background: radial-gradient(circle, #F59E0B, #D97706);
+      top: 36%;
+      left: 15%;
+      animation-duration: 15s;
+    }
+    .bokeh-4 {
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, #06B6D4, #2563EB);
+      bottom: -30px;
+      left: 5%;
+      animation-duration: 19s;
+    }
+
+    @keyframes floatBokeh {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(25px, -35px) scale(1.12); }
+      100% { transform: translate(-20px, 25px) scale(0.92); }
+    }
+
+    /* Film grain texture */
+    .film-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Slides transition */
+    .slide-page {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.97) translateY(10px);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: env(safe-area-inset-top, 16px) 18px env(safe-area-inset-bottom, 24px) 18px;
+      z-index: 10;
+    }
+
+    .slide-page.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1) translateY(0);
+      z-index: 20;
+    }
+
+    /* Story progress bar */
+    .bar-segment {
+      height: 3px;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #FAF7F2;
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+    .bar-segment.done .bar-fill {
+      width: 100%;
+    }
+    .bar-segment.active .bar-fill {
+      width: 100%;
+      transition: width 9s linear;
+    }
+
+    /* Photo cards with high z-index and tap affordance */
+    .photo-card {
+      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      cursor: pointer;
+      position: relative;
+      z-index: 50;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+    }
+    .photo-card:hover {
+      box-shadow: 0 20px 42px -6px rgba(0, 0, 0, 0.85), 0 0 0 2px rgba(240, 194, 123, 0.6);
+    }
+    .photo-card:active {
+      transform: scale(0.97);
+    }
+    .expand-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* =========================================
+       UNIQUE ENTRY ANIMATIONS FOR EACH SLIDE
+       ========================================= */
+    /* Slide 1 Animations */
+    .slide-page.active #slide1-card-1 {
+      animation: slide1Card1 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .slide-page.active #slide1-card-2 {
+      animation: slide1Card2 0.85s 0.12s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slide1Card1 {
+      0% { opacity: 0; transform: translateY(50px) rotate(-16deg) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) rotate(-5deg) scale(1); }
+    }
+    @keyframes slide1Card2 {
+      0% { opacity: 0; transform: translateY(60px) rotate(16deg) scale(0.9); }
+      100% { opacity: 1; transform: translateY(0) rotate(4deg) scale(1); }
+    }
+
+    /* Slide 2 Animations (Playful Elastic Pop) */
+    .slide-page.active #slide2-card-1 {
+      animation: slide2PopLeft 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    .slide-page.active #slide2-card-2 {
+      animation: slide2PopRight 0.7s 0.14s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes slide2PopLeft {
+      0% { opacity: 0; transform: scale(0.7) rotate(-12deg) translateY(35px); }
+      75% { transform: scale(1.04) rotate(-1deg) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) rotate(-2deg) translateY(0); }
+    }
+    @keyframes slide2PopRight {
+      0% { opacity: 0; transform: scale(0.7) rotate(12deg) translateY(35px); }
+      75% { transform: scale(1.04) rotate(3deg) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) rotate(2deg) translateY(0); }
+    }
+
+    /* Slide 3 Animations (High Fashion Horizontal Glides) */
+    .slide-page.active #slide3-card-1 {
+      animation: slide3GlideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .slide-page.active #slide3-card-2 {
+      animation: slide3GlideRight 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slide3GlideLeft {
+      0% { opacity: 0; transform: translateX(-65px) rotate(-12deg); }
+      100% { opacity: 1; transform: translateX(0) rotate(-3deg); }
+    }
+    @keyframes slide3GlideRight {
+      0% { opacity: 0; transform: translateX(65px) rotate(12deg); }
+      100% { opacity: 1; transform: translateX(0) rotate(2deg); }
+    }
+
+    /* Slide 4 Animations (Warm Memory Bloom) */
+    .slide-page.active #slide4-card-baby {
+      animation: slide4Expand 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .slide-page.active #slide4-grid-bottom {
+      animation: slide4FloatUp 0.75s 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slide4Expand {
+      0% { opacity: 0; transform: scale(0.85); filter: blur(8px); }
+      100% { opacity: 1; transform: scale(1); filter: blur(0); }
+    }
+    @keyframes slide4FloatUp {
+      0% { opacity: 0; transform: translateY(35px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slide 5 Animations (Heartbeat Pulse Reveal) */
+    .slide-page.active #slide5-video-card {
+      animation: slide5PulseIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes slide5PulseIn {
+      0% { opacity: 0; transform: scale(0.8) translateY(25px); }
+      55% { transform: scale(1.03) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Slide 6 Animation (Letter Card Settle) */
+    .slide-page.active #slide6-letter-card {
+      animation: letterCardEnter 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes letterCardEnter {
+      0% { opacity: 0; transform: translateY(45px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Button glow pulse */
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(240, 194, 123, 0.35); }
+      50% { transform: scale(1.025); box-shadow: 0 0 40px rgba(240, 194, 123, 0.7); }
+    }
+    .btn-glow {
+      animation: pulseGlow 2.8s infinite ease-in-out;
+    }
+  </style>
+</head>
+
+<body class="bg-midnight text-cream flex items-center justify-center min-h-screen">
+
+  <div id="app-container" class="relative shadow-2xl">
+    
+    <!-- DREAMY BOKEH BOUQUET MOVING BACKGROUND -->
+    <div class="bokeh-container">
+      <div class="bokeh-orb bokeh-1"></div>
+      <div class="bokeh-orb bokeh-2"></div>
+      <div class="bokeh-orb bokeh-3"></div>
+      <div class="bokeh-orb bokeh-4"></div>
+    </div>
+    
+    <!-- FILM GRAIN -->
+    <div class="film-grain"></div>
+
+    <!-- TOP STORY BARS & CONTROLS -->
+    <div id="top-bar" class="pt-3 px-4 pb-1 z-40 flex flex-col space-y-2 opacity-0 transition-opacity duration-300">
+      <div class="flex items-center space-x-1.5" id="progress-container">
+        <!-- Story segments generated via JS -->
+      </div>
+      <div class="flex justify-end items-center px-0.5 pt-0.5">
+        <button id="sound-btn" class="flex items-center space-x-1.5 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-cream text-[11px] backdrop-blur-md cursor-pointer z-50">
+          <span id="sound-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sound-text">Sound: ON</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         SLIDE 0: ELEGANT, BEAUTIFUL COVER
+         ========================================== -->
+    <div class="slide-page active text-center justify-between items-center px-6 py-10 relative z-20" id="slide-0">
+      
+      <div class="pt-4">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-gold text-xs tracking-widest uppercase">
+          <span>✨</span>
+          <span>A Birthday Story</span>
+          <span>&bull;</span>
+          <span>From Kunal</span>
+        </div>
+      </div>
+
+      <div class="space-y-6 my-auto max-w-xs relative z-30">
+        <div class="relative w-36 h-36 mx-auto">
+          <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-gold via-coral to-rose blur-lg opacity-70 animate-pulse"></div>
+          <div class="relative w-full h-full rounded-full overflow-hidden border-2 border-white/30 shadow-2xl bg-charcoal">
+            <img src="assets/photos/lime-anarkali.jpg" alt="Gunika" class="w-full h-full object-cover object-top">
+          </div>
+          <div class="absolute -bottom-1 -right-1 bg-charcoal/90 border border-gold/40 text-gold rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wider shadow">
+            Dr. Gunika
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h1 class="font-serif text-5xl md:text-6xl text-cream font-normal tracking-tight leading-none">
+            Gunika.
+          </h1>
+          <p class="font-hand text-2xl text-gold">
+            To the one who holds my heart
+          </p>
+          <p class="text-xs text-cream/70 font-light leading-relaxed max-w-[260px] mx-auto pt-1">
+            A little collection of you, our smiles, and closing the miles between us.
+          </p>
+        </div>
+
+        <div class="pt-2">
+          <button id="start-btn" class="w-full py-4 px-6 bg-gradient-to-r from-gold via-[#F5A952] to-coral text-charcoal font-semibold rounded-full text-xs tracking-widest uppercase btn-glow cursor-pointer shadow-xl flex items-center justify-center space-x-2 active:scale-95 transition-transform z-40">
+            <span>🎧 Open The Story</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pb-2 text-[11px] text-cream/40 tracking-wider">
+        Best with headphones &bull; Tap to begin
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 1: TOP OF HER CLASS / DR. GUNIKA TAYAL
+         ========================================== -->
+    <div class="slide-page" id="slide-1">
+      
+      <!-- Top Title with ample breathing room -->
+      <div class="space-y-1 pt-7 px-1 z-20">
+        <span class="text-[10px] uppercase tracking-widest text-gold font-semibold">01 &bull; The Milestone</span>
+        <h2 class="font-serif text-3xl text-cream leading-tight">The Topper Girl.</h2>
+      </div>
+
+      <!-- Main Photo Showcase with Click-to-Front + Expand -->
+      <div class="relative my-auto w-full flex flex-col items-center z-40">
+        <div class="w-full relative flex justify-center items-center h-[47vh] max-h-[380px]">
+          
+          <!-- Photo 1: Scrubs -->
+          <div id="slide1-card-1" class="photo-card absolute w-[66%] aspect-[3/4] -left-1 top-2 rotate-[-5deg] overflow-hidden bg-charcoal" data-src="assets/photos/doctor-scrubs.jpg" data-caption="Dr. Gunika Tayal &bull; Dept. of Orthodontics">
+            <img src="assets/photos/doctor-scrubs.jpg" alt="Gunika in scrubs" class="w-full h-full object-cover">
+            <div class="expand-badge">🔍 Tap to open</div>
+            <div class="absolute bottom-2 left-2 right-2 bg-black/65 backdrop-blur-sm rounded px-2 py-1 text-center">
+              <span class="text-[10px] text-cream/90 font-hand text-base leading-none">Dept. of Orthodontics 🩺</span>
+            </div>
+          </div>
+
+          <!-- Photo 2: Convocation with parents -->
+          <div id="slide1-card-2" class="photo-card absolute w-[74%] aspect-[3/4] right-0 bottom-1 rotate-[4deg] overflow-hidden bg-charcoal border-2 border-white/20 z-10" data-src="assets/photos/convocation-day.jpg" data-caption="Top of the class">
+            <img src="assets/photos/convocation-day.jpg" alt="Convocation day" class="w-full h-full object-cover">
+            <div class="expand-badge">🔍 Tap to open</div>
+            <div class="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-sm rounded px-2 py-1 text-center">
+              <span class="text-[10px] text-gold font-semibold uppercase tracking-wider">Top of the Class 🎓</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom Card: Elevated with generous bottom margin -->
+      <div class="bg-charcoal/90 border border-white/10 rounded-2xl p-4 backdrop-blur-md mb-6 z-20 shadow-xl">
+        <p class="text-sm text-cream/95 font-light leading-relaxed">
+          Dr. Gunika Tayal, the topper girl! I remember you freaking out about the exams, the biasness, but you went through all of it and came out on top. Watching you win is my favorite thing.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 2: FUNNY & UNFILTERED
+         ========================================== -->
+    <div class="slide-page" id="slide-2">
+      
+      <div class="space-y-1 pt-7 px-1 z-20">
+        <span class="text-[10px] uppercase tracking-widest text-gold font-semibold">02 &bull; The Goofball</span>
+        <h2 class="font-serif text-3xl text-cream leading-tight">Hilarious & Calm.</h2>
+      </div>
+
+      <!-- Photos with Playful Bounce Animation -->
+      <div class="my-auto w-full h-[47vh] max-h-[380px] grid grid-cols-2 gap-3 items-center z-40">
+        
+        <div id="slide2-card-1" class="photo-card h-full aspect-[9/16] overflow-hidden relative -rotate-2" data-src="assets/photos/rhinestone-glasses.jpg" data-caption="The rhinestone party glasses 😎">
+          <img src="assets/photos/rhinestone-glasses.jpg" alt="Funny glasses" class="w-full h-full object-cover">
+          <div class="expand-badge">🔍 Open</div>
+          <div class="absolute bottom-2 inset-x-2 bg-black/65 backdrop-blur-sm p-1.5 text-center rounded">
+            <span class="font-hand text-lg text-cream leading-tight">Exhibit A 😎</span>
+          </div>
+        </div>
+
+        <div id="slide2-card-2" class="photo-card h-full aspect-[9/16] overflow-hidden relative rotate-2" data-src="assets/photos/raincoat-call.jpg" data-caption="That floral raincoat video call wave 🌸">
+          <img src="assets/photos/raincoat-call.jpg" alt="Raincoat video call" class="w-full h-full object-cover">
+          <div class="expand-badge">🔍 Open</div>
+          <div class="absolute bottom-2 inset-x-2 bg-black/65 backdrop-blur-sm p-1.5 text-center rounded">
+            <span class="font-hand text-lg text-gold leading-tight">Raincoat wave 🌸</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-charcoal/90 border border-white/10 rounded-2xl p-4 backdrop-blur-md mb-6 z-20 shadow-xl">
+        <p class="text-sm text-cream/95 font-light leading-relaxed">
+          You are hilarious, you are calm, you are funny, you hold the power to make my day. Afterall you made me do kisses on video calls, now THAT was a tough task, so hats off hehe!
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 3: EFFORTLESSLY LOVELY / STUNNING
+         ========================================== -->
+    <div class="slide-page" id="slide-3">
+      
+      <div class="space-y-1 pt-7 px-1 z-20">
+        <span class="text-[10px] uppercase tracking-widest text-gold font-semibold">03 &bull; Dressing Sense</span>
+        <h2 class="font-serif text-3xl text-cream leading-tight">Effortlessly Stunning.</h2>
+      </div>
+
+      <!-- Photos with Horizontal Glide Animation -->
+      <div class="my-auto w-full h-[47vh] max-h-[380px] flex items-center justify-center relative z-40">
+        
+        <div id="slide3-card-1" class="photo-card w-[52%] h-[92%] overflow-hidden absolute left-2 -rotate-3 z-0" data-src="assets/photos/silver-ethnic.jpg" data-caption="Silver ethnic chic">
+          <img src="assets/photos/silver-ethnic.jpg" alt="Silver outfit" class="w-full h-full object-cover">
+          <div class="expand-badge">🔍 Open</div>
+        </div>
+
+        <div id="slide3-card-2" class="photo-card w-[58%] h-[100%] overflow-hidden absolute right-2 rotate-2 z-10 border-2 border-gold/40" data-src="assets/photos/lime-anarkali.jpg" data-caption="Lime green anarkali ✨">
+          <img src="assets/photos/lime-anarkali.jpg" alt="Lime green anarkali" class="w-full h-full object-cover">
+          <div class="expand-badge">🔍 Open</div>
+          <div class="absolute bottom-2 inset-x-2 bg-black/70 backdrop-blur-sm py-1 px-2 text-center rounded">
+            <span class="text-[10px] text-gold font-semibold uppercase tracking-wider">Unmatched ✨</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-charcoal/90 border border-white/10 rounded-2xl p-4 backdrop-blur-md mb-6 z-20 shadow-xl">
+        <p class="text-sm text-cream/95 font-light leading-relaxed">
+          I wish i had a dressing sense like you, but I dont have to worry about it now that I have you. I am dying to go out on a date with you, physically!
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 4: THE WARMEST HEART & HER PEOPLE
+         ========================================== -->
+    <div class="slide-page" id="slide-4">
+      
+      <div class="space-y-1 pt-7 px-1 z-20">
+        <span class="text-[10px] uppercase tracking-widest text-gold font-semibold">04 &bull; The Heart</span>
+        <h2 class="font-serif text-3xl text-cream leading-tight">Softest Heart I Know.</h2>
+      </div>
+
+      <!-- Baby + Beach/Friends with FULL UN-CROPPED BABY VIEW -->
+      <div class="my-auto w-full h-[47vh] max-h-[380px] flex flex-col justify-center space-y-2.5 z-40">
+        
+        <!-- Baby Photo: Centered framing showing both Gunika & Baby -->
+        <div id="slide4-card-baby" class="photo-card w-full h-[54%] overflow-hidden relative bg-charcoal" data-src="assets/photos/holding-baby.jpg" data-caption="Maasi with Gulli/Anvesh">
+          <img src="assets/photos/holding-baby.jpg" alt="Holding baby" class="w-full h-full object-cover object-center">
+          <div class="expand-badge">🔍 Tap to see full photo</div>
+          <div class="absolute bottom-2 left-2 bg-black/65 backdrop-blur-sm px-2.5 py-1 rounded">
+            <span class="font-hand text-base text-cream">Maasi with Gulli/Anvesh</span>
+          </div>
+        </div>
+
+        <div id="slide4-grid-bottom" class="w-full h-[44%] grid grid-cols-2 gap-2.5">
+          <div class="photo-card overflow-hidden h-full" data-src="assets/photos/beach-day.jpg" data-caption="Beach with glitter hearts & friends">
+            <img src="assets/photos/beach-day.jpg" alt="Beach with friends" class="w-full h-full object-cover">
+            <div class="expand-badge">🔍 Open</div>
+          </div>
+          <div class="photo-card overflow-hidden h-full" data-src="assets/photos/friends-dinner.jpg" data-caption="Dinner night with close friends">
+            <img src="assets/photos/friends-dinner.jpg" alt="Dinner with friends" class="w-full h-full object-cover">
+            <div class="expand-badge">🔍 Open</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-charcoal/90 border border-white/10 rounded-2xl p-4 backdrop-blur-md mb-6 z-20 shadow-xl">
+        <p class="text-sm text-cream/95 font-light leading-relaxed">
+          You have the softest heart I know. You care about people. I mean, the fact that your patients love you says a lot in itself! I think its fair to say that the company becomes good when they have you :)
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 5: LONG DISTANCE & US
+         ========================================== -->
+    <div class="slide-page" id="slide-5">
+      
+      <div class="space-y-1 pt-7 px-1 z-20">
+        <span class="text-[10px] uppercase tracking-widest text-coral font-semibold">05 &bull; Distance & Us</span>
+        <h2 class="font-serif text-3xl text-cream leading-tight">Ending Soon.</h2>
+      </div>
+
+      <!-- Restored Original Video Call Size + Exact Badges -->
+      <div class="my-auto w-full h-[47vh] max-h-[380px] flex flex-col items-center justify-center relative z-40">
+        <div id="slide5-video-card" class="photo-card w-[85%] aspect-[9/16] max-h-[380px] overflow-hidden relative border-2 border-white/20" data-src="assets/photos/raincoat-call.jpg" data-caption="Miles apart, together every single day">
+          <img src="assets/photos/raincoat-call.jpg" alt="Our video call" class="w-full h-full object-cover">
+          <div class="expand-badge">🔍 Open</div>
+          
+          <!-- Distance Badges Restored Exactly -->
+          <div class="absolute top-3 left-3 right-3 bg-black/70 backdrop-blur-md rounded-xl p-2.5 flex items-center justify-between text-xs border border-white/10">
+            <span class="text-cream/80">Miles Apart</span>
+            <span class="text-rose font-semibold">Together Every Day ❤️</span>
+          </div>
+
+          <div class="absolute bottom-3 inset-x-3 bg-black/80 backdrop-blur-md rounded-xl p-2.5 text-center border border-white/10">
+            <p class="text-xs text-gold font-medium">"Hopefully, ending soon."</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-charcoal/90 border border-white/10 rounded-2xl p-4 backdrop-blur-md mb-6 z-20 shadow-xl">
+        <p class="text-sm text-cream/95 font-light leading-relaxed">
+          Long distance is tough, very tough. I'm sorry to put you through this. I hope this long distance ends soon, I just wanna hug you tight.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ==========================================
+         SLIDE 6: THE BIRTHDAY FINALE & LETTER
+         ========================================== -->
+    <div class="slide-page text-center justify-between z-20" id="slide-6">
+      
+      <div class="pt-6"></div>
+
+      <!-- Letter Card Container: Spacious, pristine formatting -->
+      <div id="slide6-letter-card" class="bg-[#FAF7F2] text-charcoal rounded-2xl p-6 shadow-2xl text-left border border-white/10 relative z-40 overflow-hidden my-auto max-h-[62vh] flex flex-col justify-between">
+        
+        <div class="flex justify-between items-center border-b border-charcoal/10 pb-2 mb-3">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-charcoal/70">From Kunal &bull; For Gunika</span>
+          <span class="text-xs font-hand text-coral text-lg leading-none">Mahadev bless us ❤️</span>
+        </div>
+
+        <div class="space-y-3 text-xs md:text-sm font-sans font-normal text-charcoal/90 leading-relaxed overflow-y-auto pr-1">
+          <p class="font-serif italic text-lg text-charcoal font-semibold">
+            Happy Birthday Gunika,
+          </p>
+          <p>
+            Sounds cliche but hey, thanks for being in my life. Life's tough as it is, and all a person can hope is a great partner to share the goofiness, the silliness, the humour in chaos. I think I found that person.
+          </p>
+          <p>
+            May you have an amazing year, may you get everything you wish and then some more, may Mahadev bless us to have a great life together. You da best! ❤️
+          </p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-charcoal/10 flex justify-between items-center">
+          <div>
+            <span class="text-[11px] text-warmgray block leading-tight">Always yours ❤️</span>
+            <span class="font-hand text-2xl text-coral font-bold leading-none">Kunal</span>
+          </div>
+
+          <!-- Working Celebrate Button -->
+          <button id="confetti-btn" class="px-5 py-2.5 bg-charcoal text-cream rounded-full text-xs font-semibold cursor-pointer active:scale-95 transition-transform flex items-center space-x-1.5 shadow-md hover:bg-black z-50">
+            <span>🎉 Celebrate</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Replay / Action -->
+      <div class="pb-6 pt-2 z-40">
+        <button id="replay-btn" class="text-xs uppercase tracking-widest text-cream/70 hover:text-cream underline cursor-pointer py-2">
+          ↺ Watch from start
+        </button>
+      </div>
+
+    </div>
+
+    <!-- FULLSCREEN UN-CROPPED PHOTO LIGHTBOX MODAL -->
+    <div id="photo-modal" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[999] flex flex-col items-center justify-between p-4 py-8 opacity-0 pointer-events-none transition-all duration-300">
+      
+      <!-- Top header bar with Close -->
+      <div class="w-full max-w-md flex justify-between items-center z-[1000] px-2">
+        <span class="text-xs text-gold uppercase tracking-wider font-semibold">Full Photo View</span>
+        <button id="close-modal-btn" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-cream flex items-center justify-center text-xl cursor-pointer border border-white/25">
+          ✕
+        </button>
+      </div>
+
+      <!-- Image display container: 100% UN-CROPPED -->
+      <div class="w-full max-w-md my-auto flex items-center justify-center overflow-hidden p-2 z-[1000]">
+        <img id="modal-img" src="" alt="Full view" class="max-h-[72vh] max-w-full w-auto h-auto object-contain rounded-xl shadow-2xl border border-white/15">
+      </div>
+
+      <!-- Caption & Dismiss -->
+      <div class="w-full max-w-md text-center space-y-1 z-[1000]">
+        <p id="modal-caption" class="text-cream text-center font-hand text-2xl">
+          Caption
+        </p>
+        <p class="text-[10px] text-cream/50 uppercase tracking-widest">
+          Tap anywhere to close
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- AUDIO ELEMENT (Points to local generated WAV, M4A & MP3 files) -->
+  <audio id="soundtrack" loop preload="auto">
+    <source src="assets/audio/soundtrack.wav" type="audio/wav">
+    <source src="assets/audio/soundtrack.m4a" type="audio/mp4">
+    <source src="assets/audio/soundtrack.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    const totalSlides = 7; // 0 to 6
+    let currentSlide = 0;
+    const slides = [];
+    for (let i = 0; i < totalSlides; i++) {
+      slides.push(document.getElementById(`slide-${i}`));
+    }
+
+    const appContainer = document.getElementById('app-container');
+    const progressContainer = document.getElementById('progress-container');
+    const topBar = document.getElementById('top-bar');
+    const soundBtn = document.getElementById('sound-btn');
+    const soundDot = document.getElementById('sound-dot');
+    const soundText = document.getElementById('sound-text');
+    const audioEl = document.getElementById('soundtrack');
+    const startBtn = document.getElementById('start-btn');
+    const confettiBtn = document.getElementById('confetti-btn');
+    const replayBtn = document.getElementById('replay-btn');
+
+    // Lightbox modal elements
+    const photoModal = document.getElementById('photo-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalCaption = document.getElementById('modal-caption');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    let isModalOpen = false;
+
+    // Create progress bar segments for slides 1 to 6
+    const barSegments = [];
+    for (let i = 1; i < totalSlides; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'bar-segment';
+      seg.innerHTML = '<div class="bar-fill"></div>';
+      progressContainer.appendChild(seg);
+      barSegments.push(seg);
+    }
+
+    // ==========================================
+    // AUDIO ENGINE: WAV + SYNTHESIZER FALLBACK
+    // ==========================================
+    let audioCtx = null;
+    let synthInterval = null;
+    let isMusicOn = true;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playWarmChords() {
+      initAudioContext();
+      if (synthInterval) clearInterval(synthInterval);
+
+      const chords = [
+        [261.63, 329.63, 392.00], // C major
+        [329.63, 392.00, 493.88], // E minor
+        [220.00, 261.63, 329.63], // A minor
+        [174.61, 220.00, 261.63]  // F major
+      ];
+      let chordIdx = 0;
+      let noteIdx = 0;
+
+      function playStep() {
+        if (!isMusicOn || !audioCtx) return;
+        const current = chords[chordIdx];
+        const note = current[noteIdx % current.length];
+        noteIdx++;
+        if (noteIdx % 3 === 0) chordIdx = (chordIdx + 1) % chords.length;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(note, audioCtx.currentTime);
+
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.09, now + 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 2.5);
+      }
+
+      playStep();
+      synthInterval = setInterval(playStep, 800);
+    }
+
+    function startMusic() {
+      initAudioContext();
+      isMusicOn = true;
+      soundDot.classList.add('bg-emerald-400', 'animate-pulse');
+      soundDot.classList.remove('bg-rose');
+      soundText.textContent = "Sound: ON";
+      playWarmChords();
+    }
+
+    function toggleMusic() {
+      if (isMusicOn) {
+        if (synthInterval) clearInterval(synthInterval);
+        isMusicOn = false;
+        soundDot.classList.remove('bg-emerald-400', 'animate-pulse');
+        soundDot.classList.add('bg-rose');
+        soundText.textContent = "Sound: OFF";
+      } else {
+        startMusic();
+      }
+    }
+
+    soundBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMusic();
+    });
+
+    // ==========================================
+    // CONFETTI CELEBRATION
+    // ==========================================
+    function triggerCelebration() {
+      const colors = ['#F0C27B', '#FB7185', '#F472B6', '#60A5FA', '#34D399', '#FAF7F2'];
+      confetti({
+        particleCount: 80,
+        spread: 80,
+        origin: { y: 0.65 },
+        colors: colors
+      });
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 60,
+          origin: { x: 0 },
+          colors: colors
+        });
+      }, 250);
+
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 60,
+          origin: { x: 1 },
+          colors: colors
+        });
+      }, 400);
+    }
+
+    // ==========================================
+    // PHOTO POPUP / LIGHTBOX
+    // ==========================================
+    function openModal(src, caption) {
+      modalImg.src = src;
+      modalCaption.textContent = caption || '';
+      photoModal.classList.remove('opacity-0', 'pointer-events-none');
+      isModalOpen = true;
+    }
+
+    function closeModal() {
+      photoModal.classList.add('opacity-0', 'pointer-events-none');
+      isModalOpen = false;
+    }
+
+    closeModalBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeModal();
+    });
+
+    photoModal.addEventListener('click', () => {
+      closeModal();
+    });
+
+    // Slide 1 Bring-to-Front
+    const s1Card1 = document.getElementById('slide1-card-1');
+    const s1Card2 = document.getElementById('slide1-card-2');
+    if (s1Card1 && s1Card2) {
+      s1Card1.addEventListener('click', (e) => {
+        s1Card1.style.zIndex = '30';
+        s1Card2.style.zIndex = '10';
+      });
+      s1Card2.addEventListener('click', (e) => {
+        s1Card2.style.zIndex = '30';
+        s1Card1.style.zIndex = '10';
+      });
+    }
+
+    // ==========================================
+    // SLIDE NAVIGATION CONTROLLER
+    // ==========================================
+    function updateSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        if (idx === currentSlide) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      // Update story progress bars
+      if (currentSlide === 0) {
+        topBar.classList.add('opacity-0');
+        barSegments.forEach(seg => {
+          seg.classList.remove('done', 'active');
+        });
+      } else if (currentSlide === 6) {
+        topBar.classList.remove('opacity-0');
+        barSegments.forEach(seg => {
+          seg.classList.add('done');
+          seg.classList.remove('active');
+        });
+        triggerCelebration();
+      } else {
+        topBar.classList.remove('opacity-0');
+        barSegments.forEach((seg, idx) => {
+          const storyIndex = idx + 1;
+          if (storyIndex < currentSlide) {
+            seg.classList.add('done');
+            seg.classList.remove('active');
+          } else if (storyIndex === currentSlide) {
+            seg.classList.remove('done');
+            seg.classList.add('active');
+          } else {
+            seg.classList.remove('done', 'active');
+          }
+        });
+      }
+    }
+
+    // ==========================================
+    // STORY START (SLIDE 0)
+    // ==========================================
+    let hasStarted = false;
+    function beginStory(e) {
+      if (hasStarted && currentSlide > 0) return;
+      hasStarted = true;
+      if (e) e.stopPropagation();
+      startMusic();
+      updateSlide(1);
+    }
+
+    startBtn.addEventListener('click', beginStory);
+
+    // ==========================================
+    // UNIFIED SMART TAP HANDLER (NO BLOCKING OVERLAYS!)
+    // ==========================================
+    appContainer.addEventListener('click', (e) => {
+      // 1. If lightbox modal is open, don't navigate slides
+      if (isModalOpen) return;
+
+      // 2. On slide 0, only startBtn or clicking the slide starts the story
+      if (currentSlide === 0) {
+        beginStory();
+        return;
+      }
+
+      // 3. If clicking a PHOTO, OPEN THE LIGHTBOX MODAL!
+      const photoCard = e.target.closest('.photo-card');
+      if (photoCard) {
+        e.stopPropagation();
+        e.preventDefault();
+        const src = photoCard.getAttribute('data-src') || photoCard.querySelector('img').src;
+        const caption = photoCard.getAttribute('data-caption') || '';
+        openModal(src, caption);
+        return; // NEVER NAVIGATE SLIDE ON PHOTO CLICK!
+      }
+
+      // 4. If clicking on any interactive button, let it handle its own action
+      if (e.target.closest('button')) {
+        return;
+      }
+
+      // 5. On slide 6 (letter), don't navigate away accidentally
+      if (currentSlide === 6) {
+        return;
+      }
+
+      // 6. Natural story navigation on slide background!
+      const rect = appContainer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      if (clickX < rect.width * 0.35) {
+        // Tapped left 35%: go back
+        if (currentSlide > 1) {
+          updateSlide(currentSlide - 1);
+        }
+      } else {
+        // Tapped right 65%: go forward
+        if (currentSlide < totalSlides - 1) {
+          updateSlide(currentSlide + 1);
+        }
+      }
+    });
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+      if (isModalOpen) {
+        if (e.key === 'Escape') closeModal();
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        if (currentSlide === 0) {
+          beginStory();
+        } else if (currentSlide < totalSlides - 1) {
+          updateSlide(currentSlide + 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (currentSlide > 1) updateSlide(currentSlide - 1);
+      }
+    });
+
+    // Celebrate Button
+    confettiBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerCelebration();
+    });
+
+    // Replay button
+    replayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateSlide(1);
+    });
+  </script>
+</body>
+</html>
